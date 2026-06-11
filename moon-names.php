@@ -3,7 +3,8 @@
 /**
  * Moon Names Calculator
  * 
- * Calculate traditional moon names for any given date, including detection of blue moons.
+ * Calculate traditional moon names for any given date, including detection of blue moons,
+ * and determine the current moon phase (illumination percentage and phase name).
  * Supports two definitions of blue moon:
  * 1. Second full moon in a calendar month
  * 2. Third full moon in a season (astronomical definition)
@@ -40,6 +41,34 @@ class MoonNamesCalculator
     ];
 
     /**
+     * Moon phase names and their illumination ranges
+     */
+    private const MOON_PHASES = [
+        'New Moon' => [0, 1],
+        'Waxing Crescent' => [1, 25],
+        'First Quarter' => [25, 26],
+        'Waxing Gibbous' => [26, 75],
+        'Full Moon' => [75, 76],
+        'Waning Gibbous' => [76, 99],
+        'Last Quarter' => [99, 100],
+        'Waning Crescent' => [100, 101]
+    ];
+
+    /**
+     * Unicode moon symbols for visual representation
+     */
+    private const MOON_SYMBOLS = [
+        'New Moon' => '🌑',
+        'Waxing Crescent' => '🌒',
+        'First Quarter' => '🌓',
+        'Waxing Gibbous' => '🌔',
+        'Full Moon' => '🌕',
+        'Waning Gibbous' => '🌖',
+        'Last Quarter' => '🌗',
+        'Waning Crescent' => '🌘'
+    ];
+
+    /**
      * Get the traditional name for a full moon
      *
      * @param DateTime $date The date of the full moon
@@ -49,6 +78,86 @@ class MoonNamesCalculator
     {
         $month = (int)$date->format('n');
         return self::MOON_NAMES[$month] ?? 'Unknown Moon';
+    }
+
+    /**
+     * Calculate the moon phase for a given date
+     * 
+     * @param DateTime $date The date to calculate the moon phase for
+     * @return array Array containing 'illumination' (0-100), 'phase_name', and 'symbol'
+     */
+    public function getMoonPhase(DateTime $date): array
+    {
+        // Reference date: New Moon on January 6, 2000, 18:14 UTC
+        $referenceNewMoon = new DateTime('2000-01-06 18:14:00', new DateTimeZone('UTC'));
+        
+        // Lunar cycle is approximately 29.53058867 days
+        $lunarCycle = 29.53058867;
+        
+        // Convert input date to UTC for consistency
+        $date->setTimezone(new DateTimeZone('UTC'));
+        
+        // Calculate days since reference new moon
+        $interval = $date->diff($referenceNewMoon);
+        $daysSinceReference = $interval->days + ($interval->h / 24) + ($interval->i / 1440) + ($interval->s / 86400);
+        
+        // Account for date direction (past or future)
+        if ($interval->invert) {
+            $daysSinceReference = -$daysSinceReference;
+        }
+        
+        // Calculate position in current lunar cycle (0-1, where 0 is new moon, 0.5 is full moon)
+        $cyclePosition = fmod($daysSinceReference, $lunarCycle) / $lunarCycle;
+        
+        // Ensure positive value
+        if ($cyclePosition < 0) {
+            $cyclePosition += 1;
+        }
+        
+        // Calculate illumination percentage
+        // Formula: (1 - cos(2π * cyclePosition)) / 2 * 100
+        $illumination = (1 - cos(2 * M_PI * $cyclePosition)) / 2 * 100;
+        
+        // Round to nearest integer
+        $illumination = (int)round($illumination);
+        
+        // Determine phase name based on illumination
+        $phaseName = $this->getPhaseNameByIllumination($illumination);
+        $symbol = self::MOON_SYMBOLS[$phaseName] ?? '🌙';
+        
+        return [
+            'illumination' => $illumination,
+            'phase_name' => $phaseName,
+            'symbol' => $symbol,
+            'cycle_position' => round($cyclePosition, 4)
+        ];
+    }
+
+    /**
+     * Get the moon phase name based on illumination percentage
+     *
+     * @param int $illumination Illumination percentage (0-100)
+     * @return string The phase name
+     */
+    private function getPhaseNameByIllumination(int $illumination): string
+    {
+        $illumination = $illumination % 101;
+        
+        if ($illumination <= 1 || $illumination >= 99) {
+            return 'New Moon';
+        } elseif ($illumination > 1 && $illumination < 25) {
+            return 'Waxing Crescent';
+        } elseif ($illumination >= 25 && $illumination <= 26) {
+            return 'First Quarter';
+        } elseif ($illumination > 26 && $illumination < 75) {
+            return 'Waxing Gibbous';
+        } elseif ($illumination >= 75 && $illumination <= 76) {
+            return 'Full Moon';
+        } elseif ($illumination > 76 && $illumination < 99) {
+            return 'Waning Gibbous';
+        } else {
+            return 'Waning Crescent';
+        }
     }
 
     /**
@@ -68,6 +177,33 @@ class MoonNamesCalculator
         }
         
         return null;
+    }
+
+    /**
+     * Get complete moon information for any date (including phase)
+     *
+     * @param DateTime $date The date to get moon information for
+     * @return array Complete moon information including phase
+     */
+    public function getMoonInfoForDate(DateTime $date): array
+    {
+        $phase = $this->getMoonPhase($date);
+        $fullMoonInfo = $this->getFullMoonInfo($date);
+        
+        $info = [
+            'date' => $date->format('Y-m-d'),
+            'phase' => $phase,
+            'is_full_moon' => $fullMoonInfo !== null,
+        ];
+        
+        // Add full moon specific info if applicable
+        if ($fullMoonInfo) {
+            $info['moon_name'] = $fullMoonInfo['name'];
+            $info['is_blue_monthly'] = $fullMoonInfo['is_blue_monthly'];
+            $info['is_blue_astronomical'] = $fullMoonInfo['is_blue_astronomical'];
+        }
+        
+        return $info;
     }
 
     /**
@@ -302,6 +438,30 @@ if (php_sapi_name() === 'cli') {
         echo "Moon Name: {$info['name']}\n";
         echo "Is Blue Moon (Monthly): " . ($info['is_blue_monthly'] ? 'Yes' : 'No') . "\n";
         echo "Is Blue Moon (Astronomical): " . ($info['is_blue_astronomical'] ? 'Yes' : 'No') . "\n";
+    }
+    
+    // Moon phase examples
+    echo "\n" . str_repeat("=", 80) . "\n";
+    echo "Moon Phase Examples for Today\n";
+    echo str_repeat("=", 80) . "\n\n";
+    
+    $testDates = [
+        new DateTime('2026-06-11'),
+        new DateTime('2026-06-04'),
+        new DateTime('2026-06-11'),
+        new DateTime('2026-06-18'),
+    ];
+    
+    foreach ($testDates as $testDate) {
+        $fullInfo = $calculator->getMoonInfoForDate($testDate);
+        echo sprintf(
+            "%s %s | Phase: %-20s | Illumination: %3d%% | %s\n",
+            $fullInfo['phase']['symbol'],
+            $testDate->format('Y-m-d'),
+            $fullInfo['phase']['phase_name'],
+            $fullInfo['phase']['illumination'],
+            $fullInfo['is_full_moon'] ? "🌕 FULL MOON: {$fullInfo['moon_name']}" : ''
+        );
     }
 }
 ?>
