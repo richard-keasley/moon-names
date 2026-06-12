@@ -276,14 +276,34 @@ class MoonNamesCalculator
         $month_calc = ($E < 14) ? $E - 1 : $E - 13;
         $year_calc = ($month_calc > 2) ? $C - 4716 : $C - 4716;
         
-        if ((int)$year_calc !== $year) {
+        // Only accept dates that are in the requested year or adjacent years
+        // (Meeus algorithm can have precision issues near year boundaries)
+        if (abs((int)$year_calc - $year) > 1) {
             return null;
         }
         
-        $moonDate = new DateTime();
-        $moonDate->setDate($year, (int)$month_calc, (int)$day);
+        // If the calculated date is in a different year, check if it's close to the boundary
+        // and should be included (within 7 days of year end/start)
+        if ((int)$year_calc !== $year) {
+            try {
+                $moonDate = new DateTime();
+                $moonDate->setDate($year, (int)$month_calc, (int)$day);
+                $diffDays = abs($moonDate->diff(new DateTime($year . '-01-01'))->days);
+                if ($diffDays > 7 && $diffDays < 358) {
+                    return null;
+                }
+            } catch (Exception $e) {
+                return null;
+            }
+        }
         
-        return $moonDate;
+        try {
+            $moonDate = new DateTime();
+            $moonDate->setDate($year, (int)$month_calc, (int)$day);
+            return $moonDate;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**
