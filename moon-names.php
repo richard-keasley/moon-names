@@ -58,14 +58,14 @@ class MoonNamesCalculator
      * Inline SVG moon symbols for visual representation
      */
     private const MOON_SYMBOLS = [
-        'New Moon' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#000"/></svg>',
-        'Waxing Crescent' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wc"><rect width="24" height="24" fill="white"/><circle cx="16" cy="12" r="10" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#wc)"/></svg>',
-        'First Quarter' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="fq"><rect width="24" height="24" fill="white"/><rect x="12" y="0" width="12" height="24" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#fq)"/></svg>',
-        'Waxing Gibbous' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wg"><rect width="24" height="24" fill="white"/><circle cx="14" cy="12" r="10" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#wg)"/></svg>',
-        'Full Moon' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700"/><circle cx="10" cy="9" r="1" fill="#DDD" opacity="0.6"/><circle cx="14" cy="12" r="0.8" fill="#DDD" opacity="0.6"/><circle cx="11" cy="15" r="0.7" fill="#DDD" opacity="0.6"/></svg>',
-        'Waning Gibbous' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="ngb"><rect width="24" height="24" fill="white"/><circle cx="10" cy="12" r="10" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#ngb)"/></svg>',
-        'Last Quarter' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="lq"><rect width="24" height="24" fill="white"/><rect x="0" y="0" width="12" height="24" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#lq)"/></svg>',
-        'Waning Crescent' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="nc"><rect width="24" height="24" fill="white"/><circle cx="8" cy="12" r="10" fill="black"/></mask></defs><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12" cy="12" r="10" fill="#FFD700" mask="url(#nc)"/></svg>'
+        'New Moon' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12"[...]
+        'Waxing Crescent' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wc"><rect width="24" height="24" fill="white"/><circle cx="16" cy="[...]
+        'First Quarter' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="fq"><rect width="24" height="24" fill="white"/><rect x="12" y="0" wid[...]
+        'Waxing Gibbous' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="wg"><rect width="24" height="24" fill="white"/><circle cx="14" cy="1[...]
+        'Full Moon' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="none" stroke="#333" stroke-width="1"/><circle cx="12[...]
+        'Waning Gibbous' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="ngb"><rect width="24" height="24" fill="white"/><circle cx="10" cy="[...]
+        'Last Quarter' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="lq"><rect width="24" height="24" fill="white"/><rect x="0" y="0" width[...]
+        'Waning Crescent' => '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><mask id="nc"><rect width="24" height="24" fill="white"/><circle cx="8" cy="1[...]
     ];
 
     /**
@@ -274,7 +274,7 @@ class MoonNamesCalculator
         
         $day = $B - $D - floor(30.6001 * $E) + $F;
         $month_calc = ($E < 14) ? $E - 1 : $E - 13;
-        $year_calc = ($month_calc > 2) ? $C - 4716 : $C - 4715;
+        $year_calc = ($month_calc > 2) ? $C - 4716 : $C - 4716;
         
         if ((int)$year_calc !== $year) {
             return null;
