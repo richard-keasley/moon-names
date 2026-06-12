@@ -235,7 +235,7 @@ class MoonNamesCalculator
     /**
      * Calculate approximate full moon date for a given month
      * Uses astronomical calculation (Meeus' algorithm)
-     * Returns the raw calculated date regardless of year
+     * Converts JDE to Gregorian calendar by rounding to nearest day
      *
      * @param int $year The year
      * @param int $month The month
@@ -258,12 +258,23 @@ class MoonNamesCalculator
                 - 0.000000150 * $T * $T * $T
                 + 0.00000011 * $T * $T * $T * $T;
             
-            // Convert JDE (Julian Day Number) to Unix timestamp
-            // JD 2440587.5 = Unix epoch (January 1, 1970, 00:00:00 UTC)
-            $unixTimestamp = ($JDE - 2440587.5) * 86400;
+            // Round JDE to nearest day
+            $jd = round($JDE);
             
-            // Create DateTime from timestamp
-            $moonDate = new DateTime('@' . (int)$unixTimestamp);
+            // Convert JD to Gregorian calendar using standard algorithm
+            $a = intval(($jd + 32044) / 36524.25);
+            $b = intval($jd + 1 + $a - intval($a / 4));
+            $c = intval(($b + 1524) / 365.25);
+            $d = intval(($c - 122.1) / 365.25);
+            $e = intval(365.25 * $d);
+            $f = intval(($b - $e) / 30.6001);
+            
+            $dayCalc = $b - $e - intval(30.6001 * $f);
+            $monthCalc = ($f < 14) ? $f - 1 : $f - 13;
+            $yearCalc = ($monthCalc > 2) ? $c - 4716 : $c - 4715;
+            
+            // Create DateTime
+            $moonDate = new DateTime(sprintf('%04d-%02d-%02d', $yearCalc, $monthCalc, $dayCalc));
             $moonDate->setTimezone(new DateTimeZone('UTC'));
             
             return $moonDate;
