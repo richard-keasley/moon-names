@@ -216,10 +216,10 @@ class MoonNamesCalculator
     {
         $fullMoons = [];
         
-        // Calculate full moons for each month
+        // Calculate full moons for the year and the year after (to catch December moons)
         for ($month = 1; $month <= 12; $month++) {
             $moonDate = $this->calculateFullMoonInMonth($year, $month);
-            if ($moonDate) {
+            if ($moonDate && (int)$moonDate->format('Y') === $year) {
                 $fullMoons[] = $moonDate;
             }
         }
@@ -235,7 +235,7 @@ class MoonNamesCalculator
     /**
      * Calculate approximate full moon date for a given month
      * Uses astronomical calculation (Meeus' algorithm)
-     * Converts JDE directly to Unix timestamp to avoid float/integer casting issues
+     * Returns the raw calculated date regardless of year
      *
      * @param int $year The year
      * @param int $month The month
@@ -265,23 +265,6 @@ class MoonNamesCalculator
             // Create DateTime from timestamp
             $moonDate = new DateTime('@' . (int)$unixTimestamp);
             $moonDate->setTimezone(new DateTimeZone('UTC'));
-            
-            // Verify the date is in the requested year (or very close to year boundary)
-            $calcYear = (int)$moonDate->format('Y');
-            if (abs($calcYear - $year) > 1) {
-                return null;
-            }
-            
-            // If calculated in adjacent year, only accept if very close to boundary (within 2 days)
-            if ($calcYear !== $year) {
-                $dayOfYear = (int)$moonDate->format('z');
-                if ($calcYear === $year - 1 && $dayOfYear < 363) {
-                    return null;
-                }
-                if ($calcYear === $year + 1 && $dayOfYear > 1) {
-                    return null;
-                }
-            }
             
             return $moonDate;
         } catch (Exception $e) {
