@@ -1,0 +1,101 @@
+<svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- SVG Moon Phase Icons -->
+  
+  <!-- 1. New Moon -->
+  <g id="new-moon">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="50" cy="50" r="38" fill="#000"/>
+  </g>
+  
+  <!-- 2. Waxing Crescent -->
+  <g id="waxing-crescent">
+    <defs>
+      <mask id="waxing-crescent-mask">
+        <rect width="100" height="100" fill="white"/>
+        <circle cx="70" cy="50" r="38" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="50" cy="50" r="38" fill="#FFD700" mask="url(#waxing-crescent-mask)"/>
+  </g>
+  
+  <!-- 3. First Quarter -->
+  <g id="first-quarter">
+    <defs>
+      <mask id="first-quarter-mask">
+        <rect width="100" height="100" fill="white"/>
+        <rect x="50" y="0" width="50" height="100" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="150" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="150" cy="50" r="38" fill="#FFD700" mask="url(#first-quarter-mask)"/>
+  </g>
+  
+  <!-- 4. Waxing Gibbous -->
+  <g id="waxing-gibbous">
+    <defs>
+      <mask id="waxing-gibbous-mask">
+        <rect width="100" height="100" fill="white"/>
+        <circle cx="130" cy="50" r="38" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="250" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="250" cy="50" r="38" fill="#FFD700" mask="url(#waxing-gibbous-mask)"/>
+  </g>
+  
+  <!-- 5. Full Moon -->
+  <g id="full-moon">
+    <circle cx="350" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="350" cy="50" r="38" fill="#FFD700"/>
+    <!-- Add moon surface details -->
+    <circle cx="345" cy="35" r="3" fill="#DDD" opacity="0.6"/>
+    <circle cx="360" cy="50" r="2.5" fill="#DDD" opacity="0.6"/>
+    <circle cx="340" cy="65" r="2" fill="#DDD" opacity="0.6"/>
+  </g>
+  
+  <!-- 6. Waning Gibbous -->
+  <g id="waning-gibbous">
+    <defs>
+      <mask id="waning-gibbous-mask">
+        <rect width="100" height="100" fill="white"/>
+        <circle cx="370" cy="50" r="38" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="450" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="450" cy="50" r="38" fill="#FFD700" mask="url(#waning-gibbous-mask)"/>
+  </g>
+  
+  <!-- 7. Last Quarter -->
+  <g id="last-quarter">
+    <defs>
+      <mask id="last-quarter-mask">
+        <rect width="100" height="100" fill="white"/>
+        <rect x="0" y="0" width="50" height="100" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="550" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="550" cy="50" r="38" fill="#FFD700" mask="url(#last-quarter-mask)"/>
+  </g>
+  
+  <!-- 8. Waning Crescent -->
+  <g id="waning-crescent">
+    <defs>
+      <mask id="waning-crescent-mask">
+        <rect width="100" height="100" fill="white"/>
+        <circle cx="630" cy="50" r="38" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="650" cy="50" r="40" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="650" cy="50" r="38" fill="#FFD700" mask="url(#waning-crescent-mask)"/>
+  </g>
+  
+  <!-- Labels -->
+  <text x="50" y="120" text-anchor="middle" font-size="12" fill="#333">New</text>
+  <text x="150" y="120" text-anchor="middle" font-size="12" fill="#333">Waxing Cr.</text>
+  <text x="250" y="120" text-anchor="middle" font-size="12" fill="#333">First Q.</text>
+  <text x="350" y="120" text-anchor="middle" font-size="12" fill="#333">Waxing G.</text>
+  <text x="450" y="120" text-anchor="middle" font-size="12" fill="#333">Full</text>
+  <text x="550" y="120" text-anchor="middle" font-size="12" fill="#333">Waning G.</text>
+  <text x="650" y="120" text-anchor="middle" font-size="12" fill="#333">Last Q.</text>
+  <text x="750" y="120" text-anchor="middle" font-size="12" fill="#333">Waning Cr.</text>
+</svg>
