@@ -234,7 +234,8 @@ class MoonNamesCalculator
 
     /**
      * Calculate approximate full moon date for a given month
-     * Uses astronomical calculation
+     * Uses astronomical calculation (Meeus' algorithm)
+     * Converts JDE directly to Unix timestamp to avoid float/integer casting issues
      *
      * @param int $year The year
      * @param int $month The month
@@ -242,64 +243,46 @@ class MoonNamesCalculator
      */
     private function calculateFullMoonInMonth(int $year, int $month): ?DateTime
     {
-        // Using Meeus' algorithm for Moon phase
-        $k = ($year - 1900) * 12.3685 + $month - 0.5;
-        $k = floor($k); // Get the integer k for this month
-        
-        // Calculate the time of full moon (add 0.5 for full moon vs 0 for new moon)
-        $k = $k + 0.5;
-        
-        // Calculate JDE (Ephemeris Days)
-        $T = $k / 1236.85;
-        $JDE = 2451550.09766 + 29.530588861 * $k
-            + 0.00015437 * $T * $T
-            - 0.000000150 * $T * $T * $T
-            + 0.00000011 * $T * $T * $T * $T;
-        
-        // Convert JDE to Gregorian calendar
-        $Z = floor($JDE + 0.5);
-        $F = $JDE + 0.5 - $Z;
-        
-        if ($Z < 2299161) {
-            $A = $Z;
-        } else {
-            $alpha = floor(($Z - 1867216.25) / 36524.25);
-            $A = $Z + 1 + $alpha - floor($alpha / 4);
-        }
-        
-        $B = $A + 1524;
-        $C = floor(($B - 122.1) / 365.25);
-        $D = floor(365.25 * $C);
-        $E = floor(($B - $D) / 30.6001);
-        
-        $day = $B - $D - floor(30.6001 * $E) + $F;
-        $month_calc = ($E < 14) ? $E - 1 : $E - 13;
-        $year_calc = ($month_calc > 2) ? $C - 4716 : $C - 4716;
-        
-        // Only accept dates that are in the requested year or adjacent years
-        // (Meeus algorithm can have precision issues near year boundaries)
-        if (abs((int)$year_calc - $year) > 1) {
-            return null;
-        }
-        
-        // If the calculated date is in a different year, check if it's close to the boundary
-        // and should be included (within 7 days of year end/start)
-        if ((int)$year_calc !== $year) {
-            try {
-                $moonDate = new DateTime();
-                $moonDate->setDate($year, (int)$month_calc, (int)$day);
-                $diffDays = abs($moonDate->diff(new DateTime($year . '-01-01'))->days);
-                if ($diffDays > 7 && $diffDays < 358) {
-                    return null;
-                }
-            } catch (Exception $e) {
+        try {
+            // Using Meeus' algorithm for Moon phase
+            $k = ($year - 1900) * 12.3685 + $month - 0.5;
+            $k = floor($k); // Get the integer k for this month
+            
+            // Calculate the time of full moon (add 0.5 for full moon vs 0 for new moon)
+            $k = $k + 0.5;
+            
+            // Calculate JDE (Ephemeris Days)
+            $T = $k / 1236.85;
+            $JDE = 2451550.09766 + 29.530588861 * $k
+                + 0.00015437 * $T * $T
+                - 0.000000150 * $T * $T * $T
+                + 0.00000011 * $T * $T * $T * $T;
+            
+            // Convert JDE (Julian Day Number) to Unix timestamp
+            // JD 2440587.5 = Unix epoch (January 1, 1970, 00:00:00 UTC)
+            $unixTimestamp = ($JDE - 2440587.5) * 86400;
+            
+            // Create DateTime from timestamp
+            $moonDate = new DateTime('@' . (int)$unixTimestamp);
+            $moonDate->setTimezone(new DateTimeZone('UTC'));
+            
+            // Verify the date is in the requested year (or very close to year boundary)
+            $calcYear = (int)$moonDate->format('Y');
+            if (abs($calcYear - $year) > 1) {
                 return null;
             }
-        }
-        
-        try {
-            $moonDate = new DateTime();
-            $moonDate->setDate($year, (int)$month_calc, (int)$day);
+            
+            // If calculated in adjacent year, only accept if very close to boundary (within 2 days)
+            if ($calcYear !== $year) {
+                $dayOfYear = (int)$moonDate->format('z');
+                if ($calcYear === $year - 1 && $dayOfYear < 363) {
+                    return null;
+                }
+                if ($calcYear === $year + 1 && $dayOfYear > 1) {
+                    return null;
+                }
+            }
+            
             return $moonDate;
         } catch (Exception $e) {
             return null;
