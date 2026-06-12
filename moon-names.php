@@ -245,7 +245,7 @@ class MoonNamesCalculator
     {
         try {
             // Using Meeus' algorithm for Moon phase
-            $k = ($year - 1900) * 12.3685 + $month - 0.5;
+            $k = ($year - 1900) * 12.36875 + $month - 0.5;
             $k = floor($k); // Get the integer k for this month
             
             // Calculate the time of full moon (add 0.5 for full moon vs 0 for new moon)
